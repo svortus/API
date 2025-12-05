@@ -15,11 +15,13 @@ export async function insertWeightHistory(weightHistory) {
     return data;
 }
 
-export async function selectWeightHistory() {
+export async function selectWeightHistory(oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('weight_history')
         .select()
-        .or(`created_at.gte.${oldestDate},updated_at.gte.${oldestDate}`);
+        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .order('updated_at', { ascending: true });
 
     if (error) {
         console.error('Error selecting weight history:', error);

@@ -16,10 +16,12 @@ export async function insertSalesRecord(salesRecord) {
 }
 
 export async function selectSalesRecords(oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('sales_records')
         .select()
-        .or(`created_at.gte.${oldestDate},updated_at.gte.${oldestDate}`);
+        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .order('updated_at', { ascending: true });
 
     if (error) {
         console.error('Error selecting sales records:', error);

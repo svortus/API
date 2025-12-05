@@ -5,7 +5,6 @@ export async function insertUser(user) {
         .from('users')
         .insert([user])
         .select();
-        console.log("Insertando usuario:");
 
     if (error) {
         console.error('Error inserting user:', error);
@@ -16,10 +15,12 @@ export async function insertUser(user) {
 }
 
 export async function selectUsers(oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('users')
         .select()
-        .or(`created_at.gte.${oldestDate},updated_at.gte.${oldestDate}`);
+        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .order('updated_at', { ascending: true });
 
     if (error) {
         console.error('Error selecting users:', error);

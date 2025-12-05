@@ -15,10 +15,12 @@ export async function insertMilkProduction(milkProduction) {
 }
 
 export async function selectMilkProduction(oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('milk_production')
         .select()
-        .or(`created_at.gte.${oldestDate},updated_at.gte.${oldestDate}`);
+        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .order('updated_at', { ascending: true });
 
     if (error) {
         console.error('Error selecting milk production:', error);

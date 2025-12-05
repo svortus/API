@@ -13,10 +13,12 @@ export async function insertAnimal(animal) {
     return data;
 }
 export async function selectAnimal(oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
     const {data, error} = await supabase
         .from('animals')
         .select()
-        .or(`created_at.gte.${oldestDate},updated_at.gte.${oldestDate}`);
+        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .order('updated_at', { ascending: true });
 
     if(error){
         console.error('Error selecting animal:', error)
@@ -25,14 +27,18 @@ export async function selectAnimal(oldestDate) {
     return data;
 }
 export async function selectAnimalGreaterId(animal_id,oldestDate){
+    const iso = new Date(oldestDate).toISOString();
     const {data, error} = await supabase
         .from('animals')
         .select()
-        .and(`animal_id.gte.${animal_id},created_at.gte.${oldestDate}`);
+        .gte('animal_id', animal_id)
+        .gte('created_at', iso)
+        .order('updated_at', { ascending: true });
     if(error){
         console.error('Error selecting animal by id:', error)
         throw error;
     }
+    return data;
 }
 export async function updateAnimal(animal){
     const {data, error} = await supabase

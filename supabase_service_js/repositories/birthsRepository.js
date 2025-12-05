@@ -5,7 +5,7 @@ export async function insertBirth(birth) {
         .from('births')
         .insert([birth])
         .select();
-    
+
     if (error) {
         console.error('Error inserting birth:', error);
         throw error;
@@ -14,10 +14,12 @@ export async function insertBirth(birth) {
 }
 
 export async function selectBirths(oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('births')
         .select()
-        .or(`created_at.gte.${oldestDate},updated_at.gte.${oldestDate}`);
+        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .order('updated_at', { ascending: true });
     if (error) {
         console.error('Error selecting births:', error);
         throw error;

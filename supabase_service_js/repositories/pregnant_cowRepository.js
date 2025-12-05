@@ -16,10 +16,12 @@ export async function insertPregnantCow(pregnantCow) {
 }
 
 export async function selectPregnantCows(oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('pregnant_cow')
         .select()
-        .or(`created_at.gte.${oldestDate},updated_at.gte.${oldestDate}`);
+        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .order('updated_at', { ascending: true });
 
     if (error) {
         console.error('Error selecting pregnant cows:', error);
