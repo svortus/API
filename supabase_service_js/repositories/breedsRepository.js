@@ -13,12 +13,24 @@ export async function insertBreed(breed) {
     return data;
 }
 
-export async function selectBreeds(oldestDate) {
+export async function selectBreeds(oldestDate, ids = []) {
     const iso = new Date(oldestDate).toISOString();
+
+
+    const idFilter = ids.length > 0
+        ? `breed_id.in.(${ids.join(',')})`
+        : null;
+
+    const orFilters = [
+        idFilter,
+        `created_at.gte.${iso}`,
+        `updated_at.gte.${iso}`
+    ].filter(Boolean).join(',');
+
     const { data, error } = await supabase
         .from('breeds')
         .select()
-        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .or(orFilters)
         .order('updated_at', { ascending: true });
 
     if (error) {
@@ -26,6 +38,21 @@ export async function selectBreeds(oldestDate) {
         throw error;
     }
 
+    return data;
+}
+
+export async function selectBreedsGreaterId(breed_id, oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
+    const { data, error } = await supabase
+        .from('breeds')
+        .select()
+        .gte('breed_id', breed_id)
+        .gte('created_at', iso)
+        .order('updated_at', { ascending: true });
+    if (error) {
+        console.error('Error selecting breed by id:', error);
+        throw error;
+    }
     return data;
 }
 

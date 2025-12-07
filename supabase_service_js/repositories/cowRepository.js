@@ -14,12 +14,24 @@ export async function insertCow(cow) {
     return data;
 }
 
-export async function selectCows(oldestDate) {
+export async function selectCows(oldestDate, ids = []) {
     const iso = new Date(oldestDate).toISOString();
+
+
+    const idFilter = ids.length > 0
+        ? `animal_id.in.(${ids.join(',')})`
+        : null;
+
+    const orFilters = [
+        idFilter,
+        `created_at.gte.${iso}`,
+        `updated_at.gte.${iso}`
+    ].filter(Boolean).join(',');
+
     const { data, error } = await supabase
         .from('animals')
         .select()
-        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .or(orFilters)
         .order('updated_at', { ascending: true });
 
     if (error) {
@@ -27,6 +39,21 @@ export async function selectCows(oldestDate) {
         throw error;
     }
 
+    return data;
+}
+
+export async function selectCowsGreaterId(animal_id, oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
+    const { data, error } = await supabase
+        .from('animals')
+        .select()
+        .gte('animal_id', animal_id)
+        .gte('created_at', iso)
+        .order('updated_at', { ascending: true });
+    if (error) {
+        console.error('Error selecting cow by id:', error);
+        throw error;
+    }
     return data;
 }
 

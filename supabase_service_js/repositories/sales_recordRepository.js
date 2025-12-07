@@ -15,12 +15,24 @@ export async function insertSalesRecord(salesRecord) {
     return data;
 }
 
-export async function selectSalesRecords(oldestDate) {
+export async function selectSalesRecords(oldestDate, ids = []) {
     const iso = new Date(oldestDate).toISOString();
+
+
+    const idFilter = ids.length > 0
+        ? `sales_record_id.in.(${ids.join(',')})`
+        : null;
+
+    const orFilters = [
+        idFilter,
+        `created_at.gte.${iso}`,
+        `updated_at.gte.${iso}`
+    ].filter(Boolean).join(',');
+
     const { data, error } = await supabase
         .from('sales_records')
         .select()
-        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .or(orFilters)
         .order('updated_at', { ascending: true });
 
     if (error) {
@@ -28,6 +40,21 @@ export async function selectSalesRecords(oldestDate) {
         throw error;
     }
 
+    return data;
+}
+
+export async function selectSalesRecordsGreaterId(sales_record_id, oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
+    const { data, error } = await supabase
+        .from('sales_records')
+        .select()
+        .gte('sales_record_id', sales_record_id)
+        .gte('created_at', iso)
+        .order('updated_at', { ascending: true });
+    if (error) {
+        console.error('Error selecting sales record by id:', error);
+        throw error;
+    }
     return data;
 }
 

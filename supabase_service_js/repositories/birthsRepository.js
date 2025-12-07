@@ -13,18 +13,46 @@ export async function insertBirth(birth) {
     return data;
 }
 
-export async function selectBirths(oldestDate) {
+export async function selectBirths(oldestDate, ids = []) {
     const iso = new Date(oldestDate).toISOString();
+
+
+    const idFilter = ids.length > 0
+        ? `birth_id.in.(${ids.join(',')})`
+        : null;
+
+    const orFilters = [
+        idFilter,
+        `created_at.gte.${iso}`,
+        `updated_at.gte.${iso}`
+    ].filter(Boolean).join(',');
+
     const { data, error } = await supabase
         .from('births')
         .select()
-        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .or(orFilters)
         .order('updated_at', { ascending: true });
+
     if (error) {
         console.error('Error selecting births:', error);
         throw error;
     }
 
+    return data;
+}
+
+export async function selectBirthsGreaterId(birth_id, oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
+    const { data, error } = await supabase
+        .from('births')
+        .select()
+        .gte('birth_id', birth_id)
+        .gte('created_at', iso)
+        .order('updated_at', { ascending: true });
+    if (error) {
+        console.error('Error selecting birth by id:', error);
+        throw error;
+    }
     return data;
 }
 

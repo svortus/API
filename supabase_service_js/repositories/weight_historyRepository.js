@@ -15,12 +15,24 @@ export async function insertWeightHistory(weightHistory) {
     return data;
 }
 
-export async function selectWeightHistory(oldestDate) {
+export async function selectWeightHistory(oldestDate, ids = []) {
     const iso = new Date(oldestDate).toISOString();
+
+
+    const idFilter = ids.length > 0
+        ? `weight_history_id.in.(${ids.join(',')})`
+        : null;
+
+    const orFilters = [
+        idFilter,
+        `created_at.gte.${iso}`,
+        `updated_at.gte.${iso}`
+    ].filter(Boolean).join(',');
+
     const { data, error } = await supabase
         .from('weight_history')
         .select()
-        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .or(orFilters)
         .order('updated_at', { ascending: true });
 
     if (error) {
@@ -28,6 +40,21 @@ export async function selectWeightHistory(oldestDate) {
         throw error;
     }
 
+    return data;
+}
+
+export async function selectWeightHistoryGreaterId(weight_history_id, oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
+    const { data, error } = await supabase
+        .from('weight_history')
+        .select()
+        .gte('weight_history_id', weight_history_id)
+        .gte('created_at', iso)
+        .order('updated_at', { ascending: true });
+    if (error) {
+        console.error('Error selecting weight history by id:', error);
+        throw error;
+    }
     return data;
 }
 

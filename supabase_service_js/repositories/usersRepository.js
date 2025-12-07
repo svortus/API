@@ -14,12 +14,24 @@ export async function insertUser(user) {
     return data;
 }
 
-export async function selectUsers(oldestDate) {
+export async function selectUsers(oldestDate, ids = []) {
     const iso = new Date(oldestDate).toISOString();
+
+
+    const idFilter = ids.length > 0
+        ? `user_id.in.(${ids.join(',')})`
+        : null;
+
+    const orFilters = [
+        idFilter,
+        `created_at.gte.${iso}`,
+        `updated_at.gte.${iso}`
+    ].filter(Boolean).join(',');
+
     const { data, error } = await supabase
         .from('users')
         .select()
-        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .or(orFilters)
         .order('updated_at', { ascending: true });
 
     if (error) {
@@ -27,6 +39,21 @@ export async function selectUsers(oldestDate) {
         throw error;
     }
 
+    return data;
+}
+
+export async function selectUsersGreaterId(user_id, oldestDate) {
+    const iso = new Date(oldestDate).toISOString();
+    const { data, error } = await supabase
+        .from('users')
+        .select()
+        .gte('user_id', user_id)
+        .gte('created_at', iso)
+        .order('updated_at', { ascending: true });
+    if (error) {
+        console.error('Error selecting user by id:', error);
+        throw error;
+    }
     return data;
 }
 
