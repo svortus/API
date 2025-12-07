@@ -3,7 +3,7 @@ import supabase from "../database/supabase_con.js";
 
 export async function insertSalesRecord(salesRecord) {
     const { data, error } = await supabase
-        .from('sales_records')
+        .from('sales_record')
         .insert([salesRecord])
         .select();
 
