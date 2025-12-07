@@ -18,7 +18,7 @@ export async function selectDiseases(oldestDate, ids = []) {
 
 
     const idFilter = ids.length > 0
-        ? `disease_id.in.(${ids.join(',')})`
+        ? `diseases_id.in.(${ids.join(',')})`
         : null;
 
     const orFilters = [
@@ -41,12 +41,12 @@ export async function selectDiseases(oldestDate, ids = []) {
     return data;
 }
 
-export async function selectDiseasesGreaterId(disease_id, oldestDate) {
+export async function selectDiseasesGreaterId(diseases_id, oldestDate) {
     const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('diseases')
         .select()
-        .gte('disease_id', disease_id)
+        .gte('diseases_id', diseases_id)
         .gte('created_at', iso)
         .order('updated_at', { ascending: true });
     if (error) {
@@ -60,7 +60,7 @@ export async function updateDisease(disease) {
     const { data, error } = await supabase
         .from('diseases')
         .update(disease)
-        .eq('disease_id', disease.disease_id); // Cambia el nombre de la columna si tu PK es distinta
+        .eq('diseases_id', disease.diseases_id); // Cambia el nombre de la columna si tu PK es distinta
 
     if (error) {
         console.error('Error updating disease:', error);

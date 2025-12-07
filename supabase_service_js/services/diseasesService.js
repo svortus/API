@@ -28,7 +28,7 @@ export async function diseaseConflictResolution(req, res) {
         selectFn: selectDiseases,
         updateFn: updateDisease,
         insertFn: insertDisease,
-        idField: "disease_id" 
+        idField: "diseases_id" 
     });
 }
 
