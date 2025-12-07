@@ -12,20 +12,35 @@ export async function insertAnimal(animal) {
     }
     return data;
 }
-export async function selectAnimal(oldestDate) {
+
+export async function selectAnimal(oldestDate, ids = []) {
     const iso = new Date(oldestDate).toISOString();
-    const {data, error} = await supabase
+
+    
+    const idFilter = ids.length > 0 
+        ? `animal_id.in.(${ids.join(',')})`
+        : null;
+
+    const orFilters = [
+        idFilter,
+        `created_at.gte.${iso}`,
+        `updated_at.gte.${iso}`
+    ].filter(Boolean).join(',');
+
+    const { data, error } = await supabase
         .from('animals')
         .select()
-        .or(`created_at.gte.${iso},updated_at.gte.${iso}`)
+        .or(orFilters)
         .order('updated_at', { ascending: true });
 
-    if(error){
-        console.error('Error selecting animal:', error)
+    if (error) {
+        console.error('Error selecting animal:', error);
         throw error;
     }
+    
     return data;
 }
+
 export async function selectAnimalGreaterId(animal_id,oldestDate){
     const iso = new Date(oldestDate).toISOString();
     const {data, error} = await supabase

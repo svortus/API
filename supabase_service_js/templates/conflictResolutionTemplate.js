@@ -8,6 +8,7 @@ export async function conflictResolution(req, res, {
     try {
         const items = Array.isArray(req.body) ? req.body : [req.body];
 
+        // Normalizar datos
         const normalize = (item) => ({
             ...item,
             [idField]: String(item[idField]),
@@ -16,23 +17,32 @@ export async function conflictResolution(req, res, {
 
         const normalizedItems = items.map(normalize);
 
-        // IDENTIFICA EL MÁS RECIENTE PARA DEFINIR RANGO DE SELECT
-        const newestItem = normalizedItems.reduce((a, b) =>
-            b.updated_at > a.updated_at ? b : a
+        // Fecha MÁS ANTIGUA del cliente (NO más reciente)
+        const oldestItem = normalizedItems.reduce((a, b) =>
+            b.updated_at < a.updated_at ? b : a
         );
 
-        const remoteItems = await selectFn(newestItem.updated_at);
+        const oldestDate = oldestItem.updated_at;
 
-        // MAP PARA ENCONTRAR RÁPIDO
+        // IDs del cliente → esenciales para evitar duplicate key
+        const localIds = normalizedItems.map(i => i[idField]);
+
+        // Trae del servidor:
+        // - registros con esos IDs
+        // - registros más nuevos
+        const remoteItems = await selectFn(oldestDate, localIds);
+
+        // Mapa para acceso rápido
         const remoteMap = new Map(
             remoteItems.map(i => [String(i[idField]), new Date(i.updated_at)])
         );
 
         const results = [];
 
-        // 1) PROCESA ITEMS LOCALES
+        // 1) Procesar items locales
         for (const item of normalizedItems) {
             const id = item[idField];
+
             if (remoteMap.has(id)) {
                 const remoteDate = remoteMap.get(id);
 
@@ -48,20 +58,20 @@ export async function conflictResolution(req, res, {
             }
         }
 
-        // 2) PROCESA LOS QUE ESTÁN EN REMOTO PERO NO EN LOCAL → IMPORTACIÓN
-        const localIds = new Set(normalizedItems.map(i => i[idField]));
+        // 2) Los que están en remote pero no en local
+        const localIdSet = new Set(localIds);
 
         for (const remote of remoteItems) {
             const id = String(remote[idField]);
 
-            if (!localIds.has(id)) {
+            if (!localIdSet.has(id)) {
                 results.push({ status: "to_insert", remote });
             }
         }
 
-        return res.status(207).json({ 
+        return res.status(207).json({
             message: `${tableName} conflict resolved`,
-            results 
+            results
         });
 
     } catch (error) {
