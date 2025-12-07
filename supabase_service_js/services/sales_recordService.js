@@ -28,7 +28,7 @@ export async function salesRecordConflictResolution(req, res) {
         selectFn: selectSalesRecords,
         updateFn: updateSalesRecord,
         insertFn: insertSalesRecord,
-        idField: "sales_record_id" 
+        idField: "sale_id" 
     });
 }
 

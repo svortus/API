@@ -28,7 +28,7 @@ export async function weightHistoryConflictResolution(req, res) {
         selectFn: selectWeightHistory,
         updateFn: updateWeightHistory,
         insertFn: insertWeightHistory,
-        idField: "weight_history_id" 
+        idField: "weight_id" 
     });
 }
 

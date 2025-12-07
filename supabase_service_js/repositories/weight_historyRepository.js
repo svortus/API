@@ -43,12 +43,12 @@ export async function selectWeightHistory(oldestDate, ids = []) {
     return data;
 }
 
-export async function selectWeightHistoryGreaterId(weight_history_id, oldestDate) {
+export async function selectWeightHistoryGreaterId(weight_id, oldestDate) {
     const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
         .from('weight_history')
         .select()
-        .gte('weight_id', weight_history_id)
+        .gte('weight_id', weight_id)
         .gte('created_at', iso)
         .order('updated_at', { ascending: true });
     if (error) {
