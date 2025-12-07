@@ -20,7 +20,7 @@ export async function selectWeightHistory(oldestDate, ids = []) {
 
 
     const idFilter = ids.length > 0
-        ? `weight_history_id.in.(${ids.join(',')})`
+        ? `weight_id.in.(${ids.join(',')})`
         : null;
 
     const orFilters = [

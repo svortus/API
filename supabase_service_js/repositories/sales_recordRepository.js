@@ -20,7 +20,7 @@ export async function selectSalesRecords(oldestDate, ids = []) {
 
 
     const idFilter = ids.length > 0
-        ? `sales_record_id.in.(${ids.join(',')})`
+        ? `sale_id.in.(${ids.join(',')})`
         : null;
 
     const orFilters = [
