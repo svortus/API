@@ -19,10 +19,10 @@ router.post("/breeds",ApiKey, ChangeSyncedMiddleware, breedConflictResolution);
 router.post("/births",ApiKey, ChangeSyncedMiddleware, birthConflictResolution);
 router.post("/diseases",ApiKey, ChangeSyncedMiddleware, diseaseConflictResolution);
 router.post("/medications",ApiKey, ChangeSyncedMiddleware, medicationConflictResolution);
-router.post("/milk_productions",ApiKey, ChangeSyncedMiddleware, milkProductionConflictResolution);
-router.post("/pregnant_cows",ApiKey, ChangeSyncedMiddleware, pregnantCowConflictResolution);
-router.post("/sales_records",ApiKey, ChangeSyncedMiddleware, salesRecordConflictResolution);
-router.post("/weight_histories",ApiKey, ChangeSyncedMiddleware, weightHistoryConflictResolution);
+router.post("/milkProductions",ApiKey, ChangeSyncedMiddleware, milkProductionConflictResolution);
+router.post("/pregnantCows",ApiKey, ChangeSyncedMiddleware, pregnantCowConflictResolution);
+router.post("/salesRecords",ApiKey, ChangeSyncedMiddleware, salesRecordConflictResolution);
+router.post("/weightHistories",ApiKey, ChangeSyncedMiddleware, weightHistoryConflictResolution);
 
 router.get("/h",ApiKey);
 router.get("/animals",ApiKey, getAnimals);
