@@ -30,7 +30,7 @@ export async function selectSalesRecords(oldestDate, ids = []) {
     ].filter(Boolean).join(',');
 
     const { data, error } = await supabase
-        .from('sales_records')
+        .from('sales_record')
         .select()
         .or(orFilters)
         .order('updated_at', { ascending: true });
@@ -46,9 +46,9 @@ export async function selectSalesRecords(oldestDate, ids = []) {
 export async function selectSalesRecordsGreaterId(sales_record_id, oldestDate) {
     const iso = new Date(oldestDate).toISOString();
     const { data, error } = await supabase
-        .from('sales_records')
+        .from('sales_record')
         .select()
-        .gte('sales_record_id', sales_record_id)
+        .gte('sales_id', sales_record_id)
         .gte('created_at', iso)
         .order('updated_at', { ascending: true });
     if (error) {
@@ -60,9 +60,9 @@ export async function selectSalesRecordsGreaterId(sales_record_id, oldestDate) {
 
 export async function updateSalesRecord(salesRecord) {
     const { data, error } = await supabase
-        .from('sales_records')
+        .from('sales_record')
         .update(salesRecord)
-        .eq('sales_record_id', salesRecord.sales_record_id); // Ajusta el nombre de la PK si es diferente
+        .eq('sales_record_id', salesRecord.sale_id); // Ajusta el nombre de la PK si es diferente
 
     if (error) {
         console.error('Error updating sales record:', error);

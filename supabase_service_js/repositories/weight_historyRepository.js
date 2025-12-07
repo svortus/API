@@ -48,7 +48,7 @@ export async function selectWeightHistoryGreaterId(weight_history_id, oldestDate
     const { data, error } = await supabase
         .from('weight_history')
         .select()
-        .gte('weight_history_id', weight_history_id)
+        .gte('weight_id', weight_history_id)
         .gte('created_at', iso)
         .order('updated_at', { ascending: true });
     if (error) {
@@ -63,7 +63,7 @@ export async function updateWeightHistory(weightHistory) {
     const { data, error } = await supabase
         .from('weight_history')
         .update(weightHistory)
-        .eq('weight_history_id', weightHistory.weight_history_id); // Ajusta el nombre de la PK si es distinto
+        .eq('weight_id', weightHistory.weight_id); // Ajusta el nombre de la PK si es distinto
 
     if (error) {
         console.error('Error updating weight history:', error);
