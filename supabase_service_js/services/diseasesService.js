@@ -1,5 +1,5 @@
-import { insertDisease,updateDisease,selectDiseases } from "../repositories/diseasesRepository.js";
-import{ conflictResolution } from "../templates/conflictResolutionTemplate.js";
+import { insertDisease, updateDisease, selectDiseases, selectLastUpdated, selectSinceLastDate } from "../repositories/diseasesRepository.js";
+import { conflictResolution } from "../templates/conflictResolutionTemplate.js";
 
 export async function createDisease(req, res) {
     const diseases = Array.isArray(req.body) ? req.body : [req.body];
@@ -28,7 +28,27 @@ export async function diseaseConflictResolution(req, res) {
         selectFn: selectDiseases,
         updateFn: updateDisease,
         insertFn: insertDisease,
-        idField: "diseases_id" 
+        idField: "diseases_id"
     });
 }
 
+export async function getSinceDiseases(req, res) {
+    try {
+        const date = req.query.date;
+        const data = await selectSinceLastDate(date);
+        return res.status(200).json({ diseases: data });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export async function getLastUpdated(req, res) {
+    try {
+        const data = await selectLastUpdated();
+        return res.json({ last_updated: data });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}

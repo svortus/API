@@ -58,6 +58,37 @@ export async function selectWeightHistoryGreaterId(weight_id, oldestDate) {
     return data;
 }
 
+export async function selectLastUpdated() {
+    const { data, error } = await supabase
+        .from("weight_history")
+        .select("updated_at")
+        .order("updated_at", { ascending: false })
+        .limit(1);
+
+    if (error) {
+        console.error('Error selecting dates:', error);
+        throw error;
+    }
+
+    const lastUpdated = data?.[0]?.updated_at || null;
+
+    return lastUpdated;
+}
+
+export async function selectSinceLastDate(since) {
+    const iso = new Date(since).toISOString();
+
+    const { data, error } = await supabase
+        .from("weight_history")
+        .select()
+        .or(`updated_at.gte.${iso},created_at.gte.${iso}`)
+        .order("updated_at", { ascending: true });
+    if (error) {
+        console.error('Error selecting weight history:', error);
+        throw error;
+    }
+    return data;
+}
 
 export async function updateWeightHistory(weightHistory) {
     const { data, error } = await supabase

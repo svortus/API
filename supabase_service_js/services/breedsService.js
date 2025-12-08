@@ -1,5 +1,5 @@
-import { insertBreed,updateBreed,selectBreeds } from "../repositories/breedsRepository.js";
-import{ conflictResolution } from "../templates/conflictResolutionTemplate.js";
+import { insertBreed, updateBreed, selectBreeds, selectLastUpdated, selectSinceLastDate } from "../repositories/breedsRepository.js";
+import { conflictResolution } from "../templates/conflictResolutionTemplate.js";
 
 export async function createBreed(req, res) {
     const breeds = Array.isArray(req.body) ? req.body : [req.body];
@@ -28,7 +28,27 @@ export async function breedConflictResolution(req, res) {
         selectFn: selectBreeds,
         updateFn: updateBreed,
         insertFn: insertBreed,
-        idField: "breed_id" 
+        idField: "breed_id"
     });
 }
 
+export async function getSinceBreeds(req, res) {
+    try {
+        const date = req.query.date;
+        const data = await selectSinceLastDate(date);
+        return res.status(200).json({ breeds: data });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export async function getLastUpdated(req, res) {
+    try {
+        const data = await selectLastUpdated();
+        return res.json({ last_updated: data });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}

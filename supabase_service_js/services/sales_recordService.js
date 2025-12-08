@@ -1,5 +1,5 @@
-import { insertSalesRecord,updateSalesRecord,selectSalesRecords } from "../repositories/sales_recordRepository.js";
-import{ conflictResolution } from "../templates/conflictResolutionTemplate.js";
+import { insertSalesRecord, updateSalesRecord, selectSalesRecords, selectLastUpdated, selectSinceLastDate } from "../repositories/sales_recordRepository.js";
+import { conflictResolution } from "../templates/conflictResolutionTemplate.js";
 
 export async function createSalesRecord(req, res) {
     const salesRecords = Array.isArray(req.body) ? req.body : [req.body];
@@ -28,7 +28,27 @@ export async function salesRecordConflictResolution(req, res) {
         selectFn: selectSalesRecords,
         updateFn: updateSalesRecord,
         insertFn: insertSalesRecord,
-        idField: "sale_id" 
+        idField: "sale_id"
     });
 }
 
+export async function getSinceSalesRecords(req, res) {
+    try {
+        const date = req.query.date;
+        const data = await selectSinceLastDate(date);
+        return res.status(200).json({ salesRecords: data });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export async function getLastUpdated(req, res) {
+    try {
+        const data = await selectLastUpdated();
+        return res.json({ last_updated: data });
+    } catch (error) {
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}

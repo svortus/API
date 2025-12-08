@@ -1,4 +1,4 @@
-import { insertAnimal, selectAnimal, updateAnimal } from "../repositories/animalsRepository.js";
+import { insertAnimal, selectAnimal, selectLastUpdated, updateAnimal } from "../repositories/animalsRepository.js";
 import{ conflictResolution } from "../templates/conflictResolutionTemplate.js";
 export async function createAnimal(req, res) {
     const animals = Array.isArray(req.body) ? req.body : [req.body];
@@ -30,13 +30,24 @@ export async function animalConflictResolution(req, res) {
     });
 }
 
-export async function getAnimals(req, res) {
+export async function getSinceAnimals(req, res) {
     try {
-        const oldestDate = req.query.oldestDate;
-        const data = await selectAnimal(oldestDate);
+        const date = req.query.date;
+        const data = await selectSinceLastDate(date);
         return res.status(200).json({ animals: data });
     } catch (error) {
-        console.error("Error fetching animals:", error);
+        console.error("Error:", error);
+        return res.status(500).json({ error: "Internal Server Error" });
+    }
+}
+
+export async function getLastUpdated(req, res) {
+    try{
+        const data = await selectLastUpdated();
+        const lastUpdated = data?.[0]?.updated_at || null;
+        return res.json({ last_updated: lastUpdated });
+    }catch{
+        console.error("Error:", error);
         return res.status(500).json({ error: "Internal Server Error" });
     }
 }

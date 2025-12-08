@@ -56,6 +56,38 @@ export async function selectDiseasesGreaterId(diseases_id, oldestDate) {
     return data;
 }
 
+export async function selectLastUpdated() {
+    const { data, error } = await supabase
+        .from("diseases")
+        .select("updated_at")
+        .order("updated_at", { ascending: false })
+        .limit(1);
+
+    if (error) {
+        console.error('Error selecting dates:', error);
+        throw error;
+    }
+
+    const lastUpdated = data?.[0]?.updated_at || null;
+
+    return lastUpdated;
+}
+
+export async function selectSinceLastDate(since) {
+    const iso = new Date(since).toISOString();
+
+    const { data, error } = await supabase
+        .from("diseases")
+        .select()
+        .or(`updated_at.gte.${iso},created_at.gte.${iso}`)
+        .order("updated_at", { ascending: true });
+    if (error) {
+        console.error('Error selecting diseases:', error);
+        throw error;
+    }
+    return data;
+}
+
 export async function updateDisease(disease) {
     const { data, error } = await supabase
         .from('diseases')
