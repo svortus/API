@@ -42,7 +42,40 @@ export async function conflictResolution(req, res, {
         // 1) Procesar items locales
         for (const item of normalizedItems) {
             const id = item[idField];
+            if (tableName === "animals") {
 
+                const sameCode = remoteItems.find(
+                    r => r.code_animal === item.code_animal &&
+                        String(r[idField]) !== String(item[idField])
+                );
+
+                if (sameCode) {
+
+                    const remoteDate = new Date(sameCode.updated_at);
+                    const localDate = item.updated_at;
+
+                    if (localDate > remoteDate) {
+                        // local es más nuevo → actualizar el existente
+                        item[idField] = sameCode[idField];
+
+                        const updated = await updateFn(item);
+
+                        results.push({
+                            status: "merged_update",
+                            data: updated
+                        });
+
+                    } else {
+                        // remoto es más nuevo → ignorar local
+                        results.push({
+                            status: "to_update",
+                            sameCode
+                        });
+                    }
+
+                    continue; // !!! evitar insert/update normal
+                }
+            }
             if (remoteMap.has(id)) {
                 const remoteDate = remoteMap.get(id);
 
