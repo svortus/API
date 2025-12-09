@@ -74,6 +74,7 @@ export async function selectLastUpdated() {
 }
 
 export async function selectSinceLastDate(since) {
+    if (isNaN(since)) since = new Date("1970-01-01");
     const iso = new Date(since).toISOString();
 
     const { data, error } = await supabase
