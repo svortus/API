@@ -97,4 +97,14 @@ export async function updateAnimal(animal){
     }
     return data;
 }
-
+export async function updateByCode(animal){
+    const {data, error} = await supabase
+        .from('animals')
+        .update(animal)
+        .eq('code_animal',animal.code_animal);
+    if(error){
+        console.error('Error updating animal:', error)
+        throw error;
+    }
+    return data;
+}

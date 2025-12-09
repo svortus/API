@@ -1,3 +1,5 @@
+import { updateByCode } from "../repositories/animalsRepository";
+
 export async function conflictResolution(req, res, {
     tableName,
     selectFn,
@@ -58,7 +60,7 @@ export async function conflictResolution(req, res, {
                         // local es más nuevo → actualizar el existente
                         item[idField] = sameCode[idField];
 
-                        const updated = await updateFn(item);
+                        const updated = await updateByCode(item);
 
                         results.push({
                             status: "merged_update",
@@ -86,7 +88,8 @@ export async function conflictResolution(req, res, {
                 } else {
                     results.push({ status: "no_action", item });
                 }
-            } else {
+            } 
+            else {
                 results.push({ status: "inserted", data: await insertFn(item) });
             }
         }
