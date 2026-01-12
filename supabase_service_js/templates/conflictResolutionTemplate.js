@@ -1,4 +1,4 @@
-import { updateByCode } from "../repositories/animalsRepository";
+import { updateByCode } from "../repositories/animalsRepository.js";
 
 export async function conflictResolution(req, res, {
     tableName,
