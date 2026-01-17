@@ -44,8 +44,8 @@ export async function getSinceAnimals(req, res) {
 export async function getLastUpdated(req, res) {
     try{
         const data = await selectLastUpdated();
-        const lastUpdated = data?.[0]?.updated_at || null;
-        return res.json({ last_updated: lastUpdated });
+        //const lastUpdated = data?.[0]?.updated_at || null;
+        return res.json({ last_updated: data });
     }catch{
         console.error("Error:", error);
         return res.status(500).json({ error: "Internal Server Error" });
