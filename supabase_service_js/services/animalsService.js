@@ -1,4 +1,4 @@
-import { insertAnimal, selectAnimal, selectLastUpdated, updateAnimal } from "../repositories/animalsRepository.js";
+import { insertAnimal, selectAnimal, selectLastUpdated, updateAnimal, selectSinceLastDate } from "../repositories/animalsRepository.js";
 import{ conflictResolution } from "../templates/conflictResolutionTemplate.js";
 export async function createAnimal(req, res) {
     const animals = Array.isArray(req.body) ? req.body : [req.body];
