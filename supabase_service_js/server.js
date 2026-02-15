@@ -4,7 +4,9 @@ import dotenv from 'dotenv';
 dotenv.config();
 const app = express();
 const port = process.env.PORT;
-app.use(express.json());
+
+app.use(express.json({ limit: '1mb' }));
+app.use(express.urlencoded({ limit: '1mb', extended: true }));
 
 app.use('/api', router);
 app.get('/', (req, res) => {
